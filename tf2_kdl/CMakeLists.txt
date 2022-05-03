@@ -13,7 +13,7 @@ endif()
 find_package(ament_cmake REQUIRED)
 find_package(builtin_interfaces REQUIRED)
 find_package(geometry_msgs REQUIRED)
-find_package(orocos_kdl REQUIRED)
+find_package(orocos_kdl_vendor REQUIRED)
 find_package(tf2 REQUIRED)
 find_package(tf2_ros REQUIRED)
 
@@ -24,13 +24,12 @@ add_library(tf2_kdl INTERFACE)
 target_link_libraries(tf2_kdl INTERFACE
   ${builtin_interfaces_TARGETS}
   ${geometry_msgs_TARGETS}
-  orocos-kdl
+  orocos_kdl::orocos_kdl
   tf2::tf2
   tf2_ros::tf2_ros)
 target_include_directories(tf2_kdl INTERFACE
   "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
-  "$<INSTALL_INTERFACE:include/${PROJECT_NAME}>"
-  ${orocos_kdl_INCLUDE_DIRS})
+  "$<INSTALL_INTERFACE:include/${PROJECT_NAME}>")
 
 install(TARGETS tf2_kdl EXPORT export_tf2_kdl)
 

@@ -15,7 +15,7 @@ find_package(Eigen3 QUIET NO_MODULE)
 if(NOT Eigen3_FOUND)
   find_package(Eigen3 REQUIRED)
 endif()
-find_package(orocos_kdl REQUIRED)
+find_package(orocos_kdl_vendor REQUIRED)
 find_package(tf2 REQUIRED)
 
 add_library(${PROJECT_NAME} SHARED
@@ -25,7 +25,7 @@ target_include_directories(${PROJECT_NAME} PUBLIC
   "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
   "$<INSTALL_INTERFACE:include/${PROJECT_NAME}>")
 target_link_libraries(${PROJECT_NAME} PUBLIC
-  orocos-kdl
+  orocos_kdl::orocos_kdl
   tf2::tf2)
 if(TARGET Eigen3::Eigen)
   # TODO(sloretz) require target to exist when https://github.com/ros2/choco-packages/issues/19 is addressed
@@ -48,7 +48,7 @@ install(TARGETS ${PROJECT_NAME}
 
 ament_export_dependencies(
   Eigen3
-  orocos_kdl
+  orocos_kdl_vendor
   tf2
 )
 
