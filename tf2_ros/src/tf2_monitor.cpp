@@ -87,10 +87,15 @@ public:
         message.transforms[i].child_frame_id);
       if (it == delay_map.end()) {
         delay_map[message.transforms[i].child_frame_id] = std::vector<double>(1, offset);
-        frequency_map[message.transforms[i].child_frame_id] = std::vector<double>(1, clock_->now().seconds());
+        // frequency_map[message.transforms[i].child_frame_id] = std::vector<double>(
+        //  1, clock_->now().seconds());
+        frequency_map[message.transforms[i].child_frame_id] = std::vector<double>(
+          1, tf2_ros::timeToSec(
+          message.transforms[i].header.stamp));
       } else {
         it->second.push_back(offset);
-        it4->second.push_back(clock_->now().seconds());
+        // it4->second.push_back(clock_->now().seconds());
+        it4->second.push_back(tf2_ros::timeToSec(message.transforms[i].header.stamp));
         if (it->second.size() > 1000) {
           it->second.erase(it->second.begin());
           it4->second.erase(it4->second.begin());
@@ -181,8 +186,27 @@ public:
     average_delay /= it->second.size();
     double frequency_out = static_cast<double>(it4->second.size()) /
       std::max(0.00000001, (it4->second.back() - it4->second.front()));
+    double period_min = 100000;
+    double period_max = -1;
+    double mean = 0;
+    for (int i = 0; i < int(it4->second.size()); ++i) {
+      double period = it4->second[i + 1] - it4->second[i];
+      period_min = std::min(period_min, period);
+      period_max = std::max(period_max, period);
+      mean += period;
+    }
+    mean /= int(it4->second.size());
+    double stddev = 0;
+    for (int i = 0; i < int(it4->second.size()); ++i) {
+      double period = it4->second[i + 1] - it4->second[i];
+      stddev += std::pow(period - mean, 2);
+    }
+    stddev /= int(it4->second.size());
+
     ss << "Frame: " << it->first << ", published by " << frame_authority << " " << frequency_out << 
-    " Hz, Average Delay: " << average_delay << " Max Delay: " << max_delay << std::endl;
+      " Hz, Average Delay: " << average_delay << " Max Delay: " << max_delay << std::endl;
+    ss << "min: " << period_min << "[s], max: " << period_max << 
+      "[s], mean: " << mean << "[s], std: " << stddev << "[s]" << std::endl;
     return ss.str();
   }
 
