@@ -87,15 +87,11 @@ public:
         message.transforms[i].child_frame_id);
       if (it == delay_map.end()) {
         delay_map[message.transforms[i].child_frame_id] = std::vector<double>(1, offset);
-        // frequency_map[message.transforms[i].child_frame_id] = std::vector<double>(
-        //  1, clock_->now().seconds());
         frequency_map[message.transforms[i].child_frame_id] = std::vector<double>(
-          1, tf2_ros::timeToSec(
-          message.transforms[i].header.stamp));
+         1, clock_->now().seconds());
       } else {
         it->second.push_back(offset);
-        // it4->second.push_back(clock_->now().seconds());
-        it4->second.push_back(tf2_ros::timeToSec(message.transforms[i].header.stamp));
+        it4->second.push_back(clock_->now().seconds());
         if (it->second.size() > 1000) {
           it->second.erase(it->second.begin());
           it4->second.erase(it4->second.begin());
